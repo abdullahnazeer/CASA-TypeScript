@@ -23,6 +23,7 @@ task('bundle-locales', () => src(['./app/**/*.yaml'], { base: '' }).pipe(dest(ou
 task('bundle', series(['bundle-views', 'bundle-locales']));
 
 // ------------------------ Static Assets ------------------------ 
+// we grab our custom SASS files, as well as the required stylesheets from govuk library
 task('sass', () => src(['./app/assets/stylesheets/*.scss'])
   .pipe(sass({
     errLogToConsole: true,
@@ -39,10 +40,12 @@ task('js', () => src(['./app/assets/javascript/*.js'])
   .pipe(dest(`${assetsPath}/javascript`))
 );
 
+// we need to get CASA default images, like the Crown image
 task('img', () => src(['./node_modules/govuk-frontend/govuk/assets/images/**/*'])
   .pipe(dest(`${assetsPath}/images`))
 );
 
+// we need to get fonts that are used by CASA
 task('fonts', () => src(['./node_modules/govuk-frontend/govuk/assets/fonts/**/*'])
   .pipe(dest(`${assetsPath}/fonts`))
 );
