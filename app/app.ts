@@ -1,8 +1,8 @@
 import path from 'path';
+import helmet from 'helmet';
+import { MemoryStore } from 'express-session';
 import { configure, Plan } from "@dwp/govuk-casa";
 import express, { Request, Response } from 'express';
-import { MemoryStore } from 'express-session';
-import helmet from 'helmet';
 
 const app = () => {
   const casaApp = express();
