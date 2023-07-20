@@ -1,6 +1,9 @@
+import 'dotenv/config';
+import path from 'path';
 import express from 'express';
 import { noSniff } from 'helmet';
-import path from 'path';
+import { AppConfig } from 'environment';
+import { MemoryStore } from 'express-session';
 
 import app from "./app";
 
@@ -19,10 +22,28 @@ expressApp.use('/assets/js', express.static(path.resolve(__dirname, './public/ja
 expressApp.use('/assets/images', express.static(path.resolve(__dirname, './public/images')));
 expressApp.use('/assets/fonts', express.static(path.resolve(__dirname, './public/fonts')));
 
-const casaApp = app();
+/**
+ * since we are using TypeScript, we can declare a custom 'environment' module, which allows us to 
+ * specify 'AppConfig' interface, which enables auto-suggestion for our environment variables 
+ * 
+ * this does mean that updating '.env' file will require updating the 'AppConfig' interface, 
+ * which is located at '../typings/environment/index.d.ts' 
+ */
+const appConfig = { ...process.env as AppConfig };
+const name = appConfig.SESSION_ID;
+const secret = appConfig.SESSIONS_SECRET;
+const ttl = parseInt(appConfig.SESSIONS_TTL_SECONDS);
+const secure = appConfig.SECURE_COOKIES === 'true';
+const casaMountUrl = appConfig.CASA_MOUNT_URL;
+const port = parseInt(appConfig.SERVER_PORT);
 
-expressApp.use('/', casaApp);
+// !!IMPORTANT: this is ONLY for dev - MemoryStore is not suitable for PROD!
+const sessionStore = new MemoryStore();
 
-expressApp.listen(3000, () => {
-  console.log('running');
+const casaApp = app(name, secret, ttl, secure, sessionStore);
+
+expressApp.use(casaMountUrl, casaApp);
+
+expressApp.listen(port, () => {
+  console.log(`running on port: ${port}`);
 });
