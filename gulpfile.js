@@ -10,7 +10,7 @@ const sass = require('gulp-dart-sass');
 
 // has to match the outDir in tsconfig.json
 const outDir = 'dist'
-// has to match the assets directories specified in app.ts
+// has to match the assets directories specified in server.ts
 const assetsPath = `${outDir}/public`;
 
 // ------------------------ TypeScript ------------------------ 
