@@ -35,7 +35,7 @@ const secret = appConfig.SESSIONS_SECRET;
 const ttl = parseInt(appConfig.SESSIONS_TTL_SECONDS);
 const secure = appConfig.SECURE_COOKIES === 'true';
 const casaMountUrl = appConfig.CASA_MOUNT_URL;
-const port = parseInt(appConfig.SERVER_PORT);
+const port = parseInt(appConfig.S);
 
 // !!IMPORTANT: this is ONLY for dev - MemoryStore is not suitable for PROD!
 const sessionStore = new MemoryStore();
