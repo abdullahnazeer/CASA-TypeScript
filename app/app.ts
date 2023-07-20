@@ -1,15 +1,18 @@
 import path from 'path';
 import helmet from 'helmet';
-import { MemoryStore } from 'express-session';
+import { Store } from 'express-session';
 import { configure, Plan } from "@dwp/govuk-casa";
 import express, { Request, Response } from 'express';
 
-const app = () => {
+const app = (
+  name: string,
+  secret: string,
+  ttl: number,
+  secure: boolean,
+  sessionStore: Store,
+) => {
   const casaApp = express();
   casaApp.use(helmet.noSniff());
-
-  // !!IMPORTANT: this is ONLY for dev - MemoryStore is not suitable for PROD!
-  const sessionStore = new MemoryStore();
 
   const viewDir = path.join(__dirname, './views/');
   const localesDir = path.join(__dirname, './locales/');
@@ -23,10 +26,10 @@ const app = () => {
       locales: ['en'],
     },
     session: {
-      name: 'app-name',
-      secret: 'some-secret',
-      ttl: 3600,
-      secure: false,
+      name,
+      secret,
+      ttl,
+      secure,
       store: sessionStore,
     },
     pages: [
