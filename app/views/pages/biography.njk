@@ -1,0 +1,31 @@
+{% extends "layouts/journey.njk" %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "casa/components/input/macro.njk" import casaGovukInput with context %}
+
+{% block casaPageTitle %}
+  {{ t('feelings:pageTitle') }}
+{% endblock %}
+
+{% block journey_form %}
+  {% set legendHtml %}
+    <h1 class="govuk-fieldset__heading">
+      {{ t('biography:question') }}
+    </h1>
+  {% endset %}
+  
+  {% call govukFieldset({
+    legend: {
+      html: legendHtml,
+      classes: "govuk-fieldset__legend--l"
+    }
+  }) %}
+    {{ casaGovukInput({
+      name: "biography",
+      label: {
+        text: t("biography:label")
+      },
+      value: formData.biography,
+      casaErrors: formErrors
+    }) }}
+  {% endcall %}
+{% endblock %}

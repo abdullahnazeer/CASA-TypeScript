@@ -1,0 +1,5 @@
+pageTitle: "Biography"
+question: "Tell us about yourself."
+label: "Enter your biography"
+errorMessage: "Please enter your biography"
+length: "Biography cannot exceed 100 characters"

@@ -1,4 +1,5 @@
 {% extends "layouts/main.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% block casaPageTitle %}
   {{ t('start:pageTitle') }}
@@ -8,4 +9,13 @@
   <h1 class="govuk-heading-xl">
     {{ t('start:title') }}
   </h1>
+
+  {# <div class="govuk-form-group govuk-!-margin-bottom-6">
+    {{ govukButton({
+      text: t('start:text'),
+      href: '/name',
+    }) }}
+  </div> #}
+
+  <a href="/name">Get started</a>
 {% endblock %}

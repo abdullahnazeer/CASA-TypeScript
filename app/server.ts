@@ -1,14 +1,50 @@
 import 'dotenv/config';
 import path from 'path';
-import express from 'express';
 import { noSniff } from 'helmet';
-import { AppConfig } from 'environment';
 import { MemoryStore } from 'express-session';
+import { AppConfig } from 'environment';
+import express, { NextFunction, Request, Response } from 'express';
 
-import app from "./app";
+const appConfig = { ...process.env as AppConfig };
+
+// import RedisStore from "connect-redis"
+// import session from "express-session"
+// import {createClient} from "redis"
+
+import subApp from './sub-app';
+
+// // Initialize client.
+// let redisClient = createClient({
+//   password: '3kwEo1vye3kuozZ4zf4JoVhISDAA43eX',
+//   socket: {
+//     host: 'redis-19091.c3.eu-west-1-1.ec2.cloud.redislabs.com',
+//     port: 19091
+//   }
+// })
+// redisClient.connect().catch(console.error)
+
+// // Initialize store.
+// let redisStore = new RedisStore({
+//   client: redisClient,
+//   prefix: "srel:",
+//   ttl: 60000,
+// })
 
 const expressApp = express();
 expressApp.use(noSniff());
+
+// expressApp.use(session({
+//   secret: 'sample-srel',
+//   cookie: { maxAge: 60000 },
+//   store: new RedisStore({
+//     client: redisClient,
+//     prefix: "srel:",
+//     ttl: parseInt(appConfig.SESSIONS_TTL_SECONDS),
+//   }),
+//   name: 'srel',
+//   resave: false,
+//   saveUninitialized: true
+// }));
 
 /**
  * we have to consider where these assets will live relative to the transpiled JS
@@ -29,20 +65,36 @@ expressApp.use('/assets/fonts', express.static(path.resolve(__dirname, './public
  * this does mean that updating '.env' file will require updating the 'AppConfig' interface, 
  * which is located at '../typings/environment/index.d.ts' 
  */
-const appConfig = { ...process.env as AppConfig };
+
 const name = appConfig.SESSION_ID;
 const secret = appConfig.SESSIONS_SECRET;
 const ttl = parseInt(appConfig.SESSIONS_TTL_SECONDS);
 const secure = appConfig.SECURE_COOKIES === 'true';
 const casaMountUrl = appConfig.CASA_MOUNT_URL;
-const port = parseInt(appConfig.S);
+const port = parseInt(appConfig.SERVER_PORT);
 
-// !!IMPORTANT: this is ONLY for dev - MemoryStore is not suitable for PROD!
 const sessionStore = new MemoryStore();
 
-const casaApp = app(name, secret, ttl, secure, sessionStore);
+const casaApp = subApp(name, secret, ttl, secure, sessionStore);
 
-expressApp.use(casaMountUrl, casaApp);
+expressApp.get('/destroy', (req: Request, res: Response) => {
+  const sid = req.query.sid as string;
+  if (!sid) {
+    res.status(400).send('sid is required');
+    return;
+  }
+
+  sessionStore.destroy(sid, (err) => {
+    if (err) {
+      res.status(400).send(`failed to destroy session with sid ${sid}`);
+      return;
+    }
+
+    res.send(`successfully destroyed session with sid ${sid}`);
+  });
+});
+
+expressApp.use('/', casaApp);
 
 expressApp.listen(port, () => {
   console.log(`running on port: ${port}`);

@@ -1,0 +1,5 @@
+pageTitle: "Name"
+question: "What is Your name?"
+label: "Enter your name"
+errorMessage: "Please enter your name"
+length: "Your name cannot exceed 100 characters"
